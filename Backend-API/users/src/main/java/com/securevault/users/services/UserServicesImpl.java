@@ -25,23 +25,11 @@ public class UserServicesImpl implements UserService{
     public Users registerUser(String first_name, String last_name, String email, String password) throws EtAuthException {
 
         //Check if payload parameters are correct and not empty
-        if(first_name == null || last_name == null || email == null || password == null){
-            throw new EtAuthException("Unable to register. Invalid parameters passed");
-        }else if(first_name == "" && last_name  == "" && email  == "" && password == "" ){
-            throw new EtAuthException("Unable to register. Invalid email ID provided");
-        }
+        verifyPayloadParameters(first_name, last_name, email, password);
 
-        //Check if firstname and lastname are valid
-        if((Pattern.matches("[a-zA-Z ]*",first_name) == false) || (Pattern.matches("[a-zA-Z ]*",last_name) == false)){
-            throw new EtAuthException("Unable to register. Firstname and Lastname can only contain letters");
-        }else if(first_name.length() < 2 || last_name.length() < 2){
-            throw new EtAuthException("Unable to register. Firstname and Lastname should be atleast 2 letters");
-        }
+        //Check if firstname, lastname and email ID is valid
+        verifyNamesAndEmail(first_name, last_name, email);
 
-        //Check if email is valid
-        if(Pattern.matches("^(.+)@(.+)$",email) == false){
-            throw new EtAuthException("Unable to register. Invalid email ID provided");
-        }
 
         //Capitalize firstname and lastname
         first_name = capitalize(first_name);
@@ -61,7 +49,44 @@ public class UserServicesImpl implements UserService{
         return userRepository.findById(userId);
     }
 
+    /**
+     * Verify Payload Parameters
+     * @param first_name
+     * @param last_name
+     * @param email
+     * @param password
+     */
+    public void verifyPayloadParameters(String first_name, String last_name, String email, String password){
+        if(first_name == null || last_name == null || email == null || password == null){
+            throw new EtAuthException("Unable to register. Invalid parameters passed");
+        }else if(first_name == "" && last_name  == "" && email  == "" && password == "" ){
+            throw new EtAuthException("Unable to register. Invalid email ID provided");
+        }
+    }
 
+
+    /**
+     * Verify names and email ID are in correct format
+     * @param first_name
+     * @param last_name
+     * @param email
+     */
+    public void verifyNamesAndEmail(String first_name, String last_name, String email){
+        if((Pattern.matches("[a-zA-Z ]*",first_name) == false) || (Pattern.matches("[a-zA-Z ]*",last_name) == false)){
+            throw new EtAuthException("Unable to register. Firstname and Lastname can only contain letters");
+        }else if(first_name.length() < 2 || last_name.length() < 2){
+            throw new EtAuthException("Unable to register. Firstname and Lastname should be at least 2 letters");
+        }else if(Pattern.matches("^(.+)@(.+)$",email) == false){
+            throw new EtAuthException("Unable to register. Invalid email ID provided");
+        }
+    }
+
+
+    /**
+     * Generate Username
+     * @param firstname
+     * @return username
+     */
     public String generateUsername(String firstname){
         firstname = firstname.toLowerCase().trim();
         Random rand = new Random();
@@ -71,15 +96,21 @@ public class UserServicesImpl implements UserService{
         return ch1+""+ch2+""+random;
     }
 
+
+    /**
+     * Capitalize Words
+     * @param source
+     * @return capitalized sentence
+     */
     public static String capitalize(String source) {
-        String new_source = source.toLowerCase();
-        String[] splited = new_source.split(" ");
-        String name = "";
+        source = source.toLowerCase();
+        String[] splited = source.split(" ");
+        String result = "";
 
         for(String str : splited){
-            name = name + str.substring(0, 1).toUpperCase() + str.substring(1)+" ";
+            result = result + str.substring(0, 1).toUpperCase() + str.substring(1)+" ";
         }
-        return name;
+        return result;
     }
 
 }

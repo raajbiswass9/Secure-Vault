@@ -4,6 +4,7 @@ package com.securevault.users.model;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
 @Entity
@@ -14,18 +15,23 @@ public class Users {
     @Column(name = "id", updatable = false, nullable = false)
     private Integer id;
 
+    @NotBlank(message="First name can not be empty")
     @Column(nullable = false, length = 40)
     private String first_name;
 
+    @NotBlank(message="Last name can not be empty")
     @Column(nullable = false, length = 40)
     private String last_name;
 
+    @NotBlank(message="Username can not be empty")
     @Column(nullable = false, length = 8)
     private String username;
 
+    @NotBlank(message="Email ID can not be empty")
     @Column(nullable = false)
     private String email;
 
+    @NotBlank(message="Password can not be empty")
     @Column(nullable = false)
     private String password;
 
@@ -108,6 +114,7 @@ public class Users {
         this.password = password;
         this.active_status = active_status;
     }
+
 
     public Users() {
     }

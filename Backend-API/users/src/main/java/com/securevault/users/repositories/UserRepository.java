@@ -12,4 +12,6 @@ public interface UserRepository {
     Integer getCountByEmail(String email);
 
     Users findById(Integer userId);
+
+    Integer checkEmailID(String email);
 }

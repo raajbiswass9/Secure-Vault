@@ -8,63 +8,63 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import javax.validation.Valid;
+import java.util.*;
 
 @RestController
 @RequestMapping(path = "api/v1/users")
 public class UserController {
-
     @Autowired
     UserService userService;
 
-    @GetMapping("/dashboard")
-    public String getDashboard(HttpServletRequest request) {
-        int userId = (Integer) request.getAttribute("userId");
-        return "Hello user. ID: "+userId;
-    }
-
-    @GetMapping("/all")
-    public String all() {
-//        int userId = (Integer) request.getAttribute("userId");
-        return "Hello All ";
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap) {
-        String email = (String) userMap.get("email");
-        String password = (String) userMap.get("password");
-        Users user = userService.validateUser(email, password);
-        ;
-//        Map<String, String> map = new HashMap<>();
-//        map.put("Message:","User loggedin succesfully");
-//        map.put("UserDetails","Ok");
-
-//        return new ResponseEntity<>(map, HttpStatus.OK);
-        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
-    }
-
-
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody Map<String, Object> userMap){
-        String first_name = (String) userMap.get("first_name");
-        String last_name = (String) userMap.get("last_name");
-        String email = (String) userMap.get("email");
-        String password = (String) userMap.get("password");
-        Users user = userService.registerUser(first_name, last_name, email, password);
-
         Map<String, String> map = new HashMap<>();
-        map.put("Message:","all ok");
-//        map.put("UserName",user.getUsername());
+
+        try {
+            String first_name = (String) userMap.get("first_name");
+            String last_name = (String) userMap.get("last_name");
+            String email = (String) userMap.get("email");
+            String password = (String) userMap.get("password");
+            Users user = userService.registerUser(first_name, last_name, email, password);
+
+            map.put("status:","success");
+            map.put("message:","User registered successfully");
+        }catch(Exception e) {
+            map.put("status:","fail");
+            map.put("message:",e.getMessage());
+            return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
+        }
 
         return new ResponseEntity<>(map, HttpStatus.OK);
-//        return new ResponseEntity<>(generateJWTToken(user), HttpStatus.OK);
     }
 
+
+//    @PostMapping("/test")
+//    public ResponseEntity<Map<String, String>> registerUser(){
+//        Map<String, String> map = new HashMap<>();
+//
+//        try {
+//
+//            String email = "raj.biswas936@gmail.com";
+//
+//            String user = userService.findMe(email);
+//
+//            map.put("status:","success");
+//            map.put("message:","User registered successfully");
+//        }catch(Exception e) {
+//            map.put("status:","fail");
+//            map.put("message:",e.getMessage());
+//            return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
+//        }
+//
+//        return new ResponseEntity<>(map, HttpStatus.OK);
+//    }
 
     private Map<String, String> generateJWTToken(Users user) {
         long timestamp = System.currentTimeMillis();

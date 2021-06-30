@@ -23,6 +23,16 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
 
+    /**
+     * Register new user in database (Registration)
+     * @param first_name
+     * @param last_name
+     * @param username
+     * @param email
+     * @param password
+     * @return
+     * @throws EtAuthException
+     */
     @Override
     public Integer create(String first_name, String last_name, String username, String email, String password) throws EtAuthException {
         try{
@@ -38,16 +48,11 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    public Integer checkEmailID(String email){
-        Users user = userRepositoryBasic.findUserByEmail(email).orElse(null);
-        if(user == null){
-            return 0;
-        }
-
-        return user.getId();
-    }
-
-
+    /**
+     * Get all validation errors
+     * @param ex
+     * @return List of errors
+     */
     @ExceptionHandler({ ConstraintViolationException.class })
     public List<String> handleConstraintViolation(ConstraintViolationException ex) {
         List<String> errors = new ArrayList<String>();
@@ -59,6 +64,14 @@ public class UserRepositoryImpl implements UserRepository {
         return errors;
     }
 
+
+    /**
+     * Find user by email id and password (Login)
+     * @param email
+     * @param password
+     * @return user object
+     * @throws EtAuthException
+     */
     @Override
     public Users findByEmailAndPassword(String email, String password) throws EtAuthException {
 
@@ -75,15 +88,24 @@ public class UserRepositoryImpl implements UserRepository {
 
     }
 
+    /**
+     * Check if email_id exits
+     * @param email
+     * @return user_id
+     */
     @Override
     public Integer getCountByEmail(String email) {
-        return null;
+        Users user = userRepositoryBasic.findUserByEmail(email).orElse(null);
+        if(user == null){
+            return 0;
+        }
+        return user.getId();
     }
+
 
     @Override
     public Users findById(Integer userId) {
         Users newUser = userRepositoryBasic.findById(userId).orElse(null);
-
         return newUser;
     }
 }

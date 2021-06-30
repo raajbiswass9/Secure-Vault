@@ -21,6 +21,15 @@ public class UserServicesImpl implements UserService{
         return userRepository.findByEmailAndPassword(email, password);
     }
 
+    /**
+     * Register new user
+     * @param first_name
+     * @param last_name
+     * @param email
+     * @param password
+     * @return User object
+     * @throws EtAuthException
+     */
     @Override
     public Users registerUser(String first_name, String last_name, String email, String password) throws EtAuthException {
 
@@ -39,7 +48,7 @@ public class UserServicesImpl implements UserService{
         String username = generateUsername(first_name);
 
         //Check if email ID already exists
-        if(userRepository.checkEmailID(email) > 0){
+        if(userRepository.getCountByEmail(email) > 0){
             throw new EtAuthException("Unable to register. Email ID already exits");
         }
 

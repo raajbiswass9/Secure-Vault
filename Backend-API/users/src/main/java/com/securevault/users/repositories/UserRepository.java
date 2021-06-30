@@ -13,5 +13,4 @@ public interface UserRepository {
 
     Users findById(Integer userId);
 
-    Integer checkEmailID(String email);
 }

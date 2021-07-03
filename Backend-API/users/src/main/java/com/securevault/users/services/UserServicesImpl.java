@@ -16,8 +16,21 @@ public class UserServicesImpl implements UserService{
     @Autowired
     UserRepository userRepository;
 
+    /**
+     * Login user
+     * @param email
+     * @param password
+     * @return User object
+     * @throws EtAuthException
+     */
     @Override
     public Users validateUser(String email, String password) throws EtAuthException {
+        //Check if payload parameters are correct and not empty
+         verifyEamilPassPayload(email, password);
+
+        //Check if email ID  is in correct format
+        verifyEmailFormat(email);
+
         return userRepository.findByEmailAndPassword(email, password);
     }
 
@@ -34,10 +47,13 @@ public class UserServicesImpl implements UserService{
     public Users registerUser(String first_name, String last_name, String email, String password) throws EtAuthException {
 
         //Check if payload parameters are correct and not empty
-        verifyPayloadParameters(first_name, last_name, email, password);
+        verifyNamePayload(first_name, last_name);
+        verifyEamilPassPayload(email, password);
 
-        //Check if firstname, lastname and email ID is valid
-        verifyNamesAndEmail(first_name, last_name, email);
+        //Check if firstname and lastname is in correct format
+        verifyNameFormat(first_name, last_name);
+        //Check if email ID  is in correct format
+        verifyEmailFormat(email);
 
 
         //Capitalize firstname and lastname
@@ -59,37 +75,53 @@ public class UserServicesImpl implements UserService{
     }
 
     /**
-     * Verify Payload Parameters
+     * Verify Payload Parameters (First name and Last name)
      * @param first_name
      * @param last_name
+     */
+    public void verifyNamePayload(String first_name, String last_name){
+        if(first_name == null || last_name == null){
+            throw new EtAuthException("Unable to register. Invalid parameters passed");
+        }else if(first_name == "" && last_name  == ""){
+            throw new EtAuthException("Unable to register. Invalid email ID provided");
+        }
+    }
+
+    /**
+     * Verify Payload Parameters (Email ID and Password)
      * @param email
      * @param password
      */
-    public void verifyPayloadParameters(String first_name, String last_name, String email, String password){
-        if(first_name == null || last_name == null || email == null || password == null){
-            throw new EtAuthException("Unable to register. Invalid parameters passed");
-        }else if(first_name == "" && last_name  == "" && email  == "" && password == "" ){
-            throw new EtAuthException("Unable to register. Invalid email ID provided");
+    public void verifyEamilPassPayload(String email, String password){
+        if(email == null || password == null){
+            throw new EtAuthException("Invalid parameters passed");
+        }else if(email  == "" && password == "" ){
+            throw new EtAuthException("Invalid email ID provided");
         }
     }
-
 
     /**
-     * Verify names and email ID are in correct format
+     * Verify names are in correct format
      * @param first_name
      * @param last_name
-     * @param email
      */
-    public void verifyNamesAndEmail(String first_name, String last_name, String email){
+    public void verifyNameFormat(String first_name, String last_name){
         if((Pattern.matches("[a-zA-Z ]*",first_name) == false) || (Pattern.matches("[a-zA-Z ]*",last_name) == false)){
-            throw new EtAuthException("Unable to register. Firstname and Lastname can only contain letters");
+            throw new EtAuthException("First name and Last name can only contain letters");
         }else if(first_name.length() < 2 || last_name.length() < 2){
-            throw new EtAuthException("Unable to register. Firstname and Lastname should be at least 2 letters");
-        }else if(Pattern.matches("^(.+)@(.+)$",email) == false){
-            throw new EtAuthException("Unable to register. Invalid email ID provided");
+            throw new EtAuthException("First name and Last name should be at least 2 letters");
         }
     }
 
+    /**
+     * Verify email is in correct format
+     * @param email
+     */
+    public void verifyEmailFormat(String email){
+        if(Pattern.matches("^(.+)@(.+)$",email) == false){
+            throw new EtAuthException("Invalid email ID provided");
+        }
+    }
 
     /**
      * Generate Username

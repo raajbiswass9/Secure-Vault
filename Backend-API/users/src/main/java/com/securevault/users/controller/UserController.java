@@ -22,6 +22,25 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> loginUser(@RequestBody Map<String, Object> userMap) {
+        Map<String, String> map = new HashMap<>();
+        try{
+            String email = (String) userMap.get("email");
+            String password = (String) userMap.get("password");
+            Users user = userService.validateUser(email, password);
+            map.put("status:","success");
+            map.put("token:",generateJWTToken(user));
+        }catch(Exception e){
+            map.put("status:","fail");
+            map.put("message:",e.getMessage());
+            return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
+        }
+
+        return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody Map<String, Object> userMap){
         Map<String, String> map = new HashMap<>();
@@ -37,7 +56,7 @@ public class UserController {
             map.put("message:","User registered successfully");
         }catch(Exception e) {
             map.put("status:","fail");
-            map.put("message:",e.getMessage());
+            map.put("message:","Unable to register. "+e.getMessage());
             return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
         }
 
@@ -45,28 +64,7 @@ public class UserController {
     }
 
 
-//    @PostMapping("/test")
-//    public ResponseEntity<Map<String, String>> registerUser(){
-//        Map<String, String> map = new HashMap<>();
-//
-//        try {
-//
-//            String email = "raj.biswas936@gmail.com";
-//
-//            String user = userService.findMe(email);
-//
-//            map.put("status:","success");
-//            map.put("message:","User registered successfully");
-//        }catch(Exception e) {
-//            map.put("status:","fail");
-//            map.put("message:",e.getMessage());
-//            return new ResponseEntity<>(map, HttpStatus.UNAUTHORIZED);
-//        }
-//
-//        return new ResponseEntity<>(map, HttpStatus.OK);
-//    }
-
-    private Map<String, String> generateJWTToken(Users user) {
+    private String generateJWTToken(Users user) {
         long timestamp = System.currentTimeMillis();
         String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, Constants.API_SECRET_KEY)
                 .setIssuedAt(new Date(timestamp))
@@ -75,9 +73,10 @@ public class UserController {
                 .claim("email", user.getEmail())
                 .claim("username", user.getUsername())
                 .compact();
-        Map<String, String> map = new HashMap<>();
-        map.put("token", token);
-        return map;
+//        Map<String, String> map = new HashMap<>();
+//        map.put("token", token);
+//        return map;
+        return token;
     }
 
 }

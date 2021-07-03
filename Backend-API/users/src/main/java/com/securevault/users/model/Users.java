@@ -86,11 +86,11 @@ public class Users {
         this.password = password;
     }
 
-    public boolean isActive_status() {
+    public boolean activeStatus() {
         return active_status;
     }
 
-    public void setActive_status(boolean active_status) {
+    public void activeStatus(boolean active_status) {
         this.active_status = active_status;
     }
 

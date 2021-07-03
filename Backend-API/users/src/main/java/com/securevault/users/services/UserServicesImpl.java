@@ -55,7 +55,6 @@ public class UserServicesImpl implements UserService{
         //Check if email ID  is in correct format
         verifyEmailFormat(email);
 
-
         //Capitalize firstname and lastname
         first_name = capitalize(first_name);
         last_name = capitalize(last_name);

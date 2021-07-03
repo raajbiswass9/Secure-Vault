@@ -104,7 +104,9 @@ public class UserRepositoryImpl implements UserRepository {
     public Integer getCountByEmail(String email) {
         Users user = userRepositoryBasic.findUserByEmail(email).orElse(null);
         if(user == null){
-            return 0;
+            return 0; //If email ID does not exits
+        }else if(user.activeStatus() == false){
+            return 0;  //If email ID deleted(soft deleted)
         }
         return user.getId();
     }
